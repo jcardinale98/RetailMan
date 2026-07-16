@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}RetailMan{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="brand">
+            <div class="brand-logo">R</div>
+            <div>
+                <h1>RetailMan</h1>
+                <span>Category Management</span>
+            </div>
+        </div>
+
+        <nav>
+            <p class="menu-title">MENÚ PRINCIPAL</p>
+            <a href="{{ url_for('proximamente') }}"><span>⌂</span> Dashboard</a>
+            <a href="{{ url_for('proximamente') }}"><span>♙</span> Clientes</a>
+            <a class="active" href="{{ url_for('productos') }}"><span>▣</span> Tienda</a>
+            <a href="{{ url_for('proximamente') }}"><span>▥</span> Reportes</a>
+
+            <p class="menu-title">MAESTROS</p>
+            <a class="subactive" href="{{ url_for('productos') }}"><span>◇</span> Productos</a>
+            <a href="{{ url_for('proximamente') }}"><span>♧</span> Categorías</a>
+            <a href="{{ url_for('proximamente') }}"><span>⌖</span> Puntos de Venta</a>
+            <a href="{{ url_for('proximamente') }}"><span>◇</span> Marcas</a>
+            <a href="{{ url_for('proximamente') }}"><span>▤</span> Fabricantes</a>
+            <a href="{{ url_for('proximamente') }}"><span>◎</span> Retailers</a>
+            <a href="{{ url_for('proximamente') }}"><span>▦</span> Formatos</a>
+            <a href="{{ url_for('proximamente') }}"><span>◉</span> Mercados</a>
+        </nav>
+
+        
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <div>
+                <h2>Tienda</h2>
+                <div class="breadcrumbs">Inicio <span>›</span> Tienda <span>›</span> Productos</div>
+            </div>
+            <div class="profile">
+                <div class="avatar">CM</div>
+                <div>
+                    <strong>Catalina Mora</strong>
+                    <span>Analista CATMAN</span>
+                </div>
+                <span>⌄</span>
+            </div>
+        </header>
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
