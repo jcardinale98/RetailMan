@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+{% block title %}Productos | RetailMan{% endblock %}
+
+{% block content %}
+<section class="page-content">
+    <div class="page-heading">
+        <div>
+            <h3>Catálogo de Productos</h3>
+            <p>Administra y consulta los productos centralizados de todas las fuentes.</p>
+        </div>
+        <button class="primary-btn" type="button" onclick="mostrarAviso()">＋ Nuevo producto</button>
+    </div>
+
+    <div class="stats-grid">
+        <article class="stat-card">
+            <div class="stat-icon purple">◇</div>
+            <div><span>Total Productos</span><strong>12,458</strong><small>+5.2% <em>vs mes anterior</em></small></div>
+        </article>
+        <article class="stat-card">
+            <div class="stat-icon green">◇</div>
+            <div><span>Marcas</span><strong>324</strong><small>+2.1% <em>vs mes anterior</em></small></div>
+        </article>
+        <article class="stat-card">
+            <div class="stat-icon blue">▣</div>
+            <div><span>Puntos de Venta</span><strong>1,248</strong><small>+3.7% <em>vs mes anterior</em></small></div>
+        </article>
+        <article class="stat-card">
+            <div class="stat-icon orange">▦</div>
+            <div><span>Categorías</span><strong>156</strong><small>+1.4% <em>vs mes anterior</em></small></div>
+        </article>
+    </div>
+
+    <form class="filters" method="get" action="{{ url_for('productos') }}">
+        <label class="search-field">
+            <span>⌕</span>
+            <input name="q" value="{{ q or '' }}" placeholder="Buscar por nombre, SKU o GTIN...">
+        </label>
+
+        <label>
+            <span>Categoría</span>
+            <select disabled>
+                <option>Todas</option>
+            </select>
+        </label>
+
+        <label>
+            <span>Marca</span>
+            <select name="marca">
+                <option value="">Todas</option>
+                {% for nombre in ["Coca-Cola", "La Costeña", "Kellogg's", "Ariel", "Snickers", "Dos Pinos"] %}
+                <option value="{{ nombre }}" {% if marca_seleccionada == nombre %}selected{% endif %}>{{ nombre }}</option>
+                {% endfor %}
+            </select>
+        </label>
+
+        <label>
+            <span>Estado</span>
+            <select name="estado">
+                <option value="">Todos</option>
+                <option value="ACTIVE" {% if estado_seleccionado == "ACTIVE" %}selected{% endif %}>Activo</option>
+                <option value="INACTIVE" {% if estado_seleccionado == "INACTIVE" %}selected{% endif %}>Inactivo</option>
+            </select>
+        </label>
+
+        <button class="filter-btn" type="submit">Buscar</button>
+    </form>
+
+    <div class="tabs">
+        <button class="selected">Todos los productos</button>
+        <button type="button" onclick="mostrarAviso()">Mis productos favoritos</button>
+        <button type="button" onclick="mostrarAviso()">Productos sin mapear</button>
+    </div>
+
+    <section class="table-card">
+        <div class="table-scroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>SKU Interno</th>
+                        <th>GTIN Principal</th>
+                        <th>Marca</th>
+                        <th>Categoría</th>
+                        <th>Presentación</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for producto in productos %}
+                    <tr>
+                        <td>
+                            <div class="product-cell">
+                                <div class="product-image">{{ producto.icono }}</div>
+                                <div>
+                                    <strong>{{ producto.descripcion }}</strong>
+                                    <span>{{ producto.detalle }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td><a href="#" onclick="mostrarAviso(); return false;">{{ producto.sku }}</a></td>
+                        <td>{{ producto.gtin }}</td>
+                        <td>{{ producto.marca }}</td>
+                        <td>{{ producto.categoria }}</td>
+                        <td>{{ producto.presentacion }}<small>{{ producto.envase }}</small></td>
+                        <td>
+                            <span class="status {{ 'inactive' if producto.estado == 'INACTIVE' else '' }}">
+                                {{ 'Inactivo' if producto.estado == 'INACTIVE' else 'Activo' }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="actions">
+                                <button title="Ver" onclick="mostrarAviso()">◉</button>
+                                <button title="Editar" onclick="mostrarAviso()">✎</button>
+                                <button title="Más" onclick="mostrarAviso()">⋮</button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="empty">No se encontraron productos con esos filtros.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <footer class="table-footer">
+            <span>Mostrando {{ productos|length }} productos de ejemplo</span>
+            <div class="pagination">
+                <button disabled>‹</button>
+                <button class="current">1</button>
+                <button>2</button>
+                <button>3</button>
+                <span>…</span>
+                <button>2077</button>
+                <button>›</button>
+            </div>
+        </footer>
+    </section>
+</section>
+
+<div id="toast" class="toast">Esta función se completará en la segunda etapa.</div>
+{% endblock %}
