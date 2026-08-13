@@ -1,1 +1,82 @@
-{% extends 'base.html' %}{% block title %}{{ 'Editar' if producto else 'Nuevo' }} producto | RetailMan{% endblock %}{% block content %}<section class="content narrow"><div class="heading"><div><h1>{{ 'Editar producto' if producto else 'Nuevo producto' }}</h1><p>Guarda mediante los procedimientos de RetailMan.sql.</p></div><a class="btn" href="{{ url_for('productos') }}">← Volver</a></div><form class="form-card" method="post"><div class="grid"><label>SKU<input name="sku_code" value="{{ producto.sku_code if producto else '' }}"></label><label>Marca<select name="brand_id"><option value="">Sin marca</option>{% for m in marcas %}<option value="{{ m.brand_id }}" {% if producto and producto.brand_id==m.brand_id %}selected{% endif %}>{{ m.name }}</option>{% endfor %}</select></label><label class="wide">Descripción *<input required name="description" value="{{ producto.description if producto else '' }}"></label><label>Contenido neto<input type="number" step="0.001" name="net_content" value="{{ producto.net_content if producto and producto.net_content is not none else '' }}"></label><label>Unidad<input name="uom" placeholder="g, kg, ml, L" value="{{ producto.uom if producto else '' }}"></label><label>Presentación<input name="presentation" value="{{ producto.presentation if producto else '' }}"></label><label>Estado<select name="status"><option value="ACTIVE" {% if not producto or producto.status=='ACTIVE' %}selected{% endif %}>ACTIVE</option><option value="INACTIVE" {% if producto and producto.status=='INACTIVE' %}selected{% endif %}>INACTIVE</option></select></label></div><div class="form-actions"><button class="btn primary" type="submit">Guardar producto</button></div></form>{% if producto %}<div class="split"><form class="form-card" method="post" action="{{ url_for('producto_gtin',product_id=producto.product_id) }}"><h3>GTIN asociados</h3>{% for g in gtins %}<span class="chip">{{ g.gtin }}</span>{% else %}<p>Sin GTIN.</p>{% endfor %}<label>Nuevo GTIN<input required name="gtin"></label><button class="btn" type="submit">Asociar GTIN</button></form><form class="form-card" method="post" action="{{ url_for('producto_categoria',product_id=producto.product_id) }}"><h3>Categorías</h3><label>Asignar categoría<select required name="category_id"><option value="">Seleccione...</option>{% for c in categorias %}<option value="{{ c.category_id }}" {% if c.category_id in asignadas %}disabled{% endif %}>{{ c.name }}</option>{% endfor %}</select></label><button class="btn" type="submit">Asignar</button></form></div>{% endif %}</section>{% endblock %}
+{% extends 'base.html' %}
+{% block title %}{{ 'Editar' if producto else 'Nuevo' }} producto | RetailMan{% endblock %}
+{% block content %}
+<section class="content narrow">
+  <div class="heading">
+    <div><h1>{{ 'Editar producto' if producto else 'Nuevo producto' }}</h1><p>Guarda mediante los procedimientos de RetailMan.sql.</p></div>
+    <a class="btn" href="{{ url_for('productos') }}">← Volver</a>
+  </div>
+
+  <form class="form-card" method="post">
+    <div class="grid">
+      <label>SKU<input name="sku_code" value="{{ producto.sku_code if producto else '' }}"></label>
+      <label>Marca *
+        <select name="brand_id" required>
+          <option value="">Seleccione...</option>
+          {% for m in marcas %}
+          <option value="{{ m.brand_id }}" {% if producto and producto.brand_id==m.brand_id %}selected{% endif %}>{{ m.name }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label class="wide">Descripción *<input required name="description" value="{{ producto.description if producto else '' }}"></label>
+      <label>Contenido neto<input type="number" step="0.001" name="net_content" value="{{ producto.net_content if producto and producto.net_content is not none else '' }}"></label>
+      <label>Unidad<input name="uom" placeholder="g, kg, ml, L" value="{{ producto.uom if producto else '' }}"></label>
+      <label>Presentación<input name="presentation" value="{{ producto.presentation if producto else '' }}"></label>
+      <label>Estado
+        <select name="status">
+          <option value="ACTIVE" {% if not producto or producto.status=='ACTIVE' %}selected{% endif %}>ACTIVE</option>
+          <option value="INACTIVE" {% if producto and producto.status=='INACTIVE' %}selected{% endif %}>INACTIVE</option>
+        </select>
+      </label>
+    </div>
+    <div class="form-actions"><button class="btn primary" type="submit">Guardar producto</button></div>
+  </form>
+
+  {% if producto %}
+  <div class="split">
+    <div class="form-card">
+      <h3>GTIN asociados</h3>
+      {% for g in gtins %}
+      <div class="relation-row">
+        <span class="chip">{{ g.gtin }}</span>
+        <form method="post" action="{{ url_for('producto_gtin_eliminar',product_id=producto.product_id) }}">
+          <input type="hidden" name="gtin" value="{{ g.gtin }}">
+          <button class="link-danger" data-confirm="¿Eliminar este GTIN?">Eliminar</button>
+        </form>
+      </div>
+      {% else %}<p>Sin GTIN.</p>{% endfor %}
+
+      <form method="post" action="{{ url_for('producto_gtin',product_id=producto.product_id) }}">
+        <label>Nuevo GTIN<input required name="gtin"></label>
+        <button class="btn" type="submit">Asociar GTIN</button>
+      </form>
+    </div>
+
+    <div class="form-card">
+      <h3>Categorías</h3>
+      {% for c in asignadas %}
+      <div class="relation-row">
+        <span class="chip">Nivel {{ c.level_no }} · {{ c.name }}</span>
+        <form method="post" action="{{ url_for('producto_categoria_eliminar',product_id=producto.product_id) }}">
+          <input type="hidden" name="category_id" value="{{ c.category_id }}">
+          <button class="link-danger" data-confirm="¿Desasociar esta categoría?">Quitar</button>
+        </form>
+      </div>
+      {% else %}<p>Sin categorías asociadas.</p>{% endfor %}
+
+      <form method="post" action="{{ url_for('producto_categoria',product_id=producto.product_id) }}">
+        <label>Asignar categoría
+          <select required name="category_id">
+            <option value="">Seleccione...</option>
+            {% for c in categorias %}
+            <option value="{{ c.category_id }}" {% if c.category_id in asignadas_ids %}disabled{% endif %}>Nivel {{ c.level_no }} · {{ c.name }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <button class="btn" type="submit">Asignar</button>
+      </form>
+    </div>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

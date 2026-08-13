@@ -1,1 +1,52 @@
-{% extends 'base.html' %}{% block title %}Productos | RetailMan{% endblock %}{% block content %}<section class="content"><div class="heading"><div><h1>Productos / SKU</h1><p>Consulta real de SKU, MARCA, PRODUCTOS_GTIN, PRODUCTO_CATEGORIA y CATEGORIA.</p></div><a class="btn primary" href="{{ url_for('producto_nuevo') }}">＋ Nuevo producto</a></div>{% if db_error %}<div class="alert"><b>Error de Oracle</b><span>{{ db_error }}</span></div>{% endif %}<form class="filters" method="get"><input name="q" value="{{ q }}" placeholder="Buscar SKU, descripción o GTIN"><select name="marca"><option value="">Todas las marcas</option>{% for m in marcas %}<option value="{{ m.brand_id }}" {% if marca_sel==m.brand_id|string %}selected{% endif %}>{{ m.name }}</option>{% endfor %}</select><select name="categoria"><option value="">Todas las categorías</option>{% for c in categorias %}<option value="{{ c.category_id }}" {% if categoria_sel==c.category_id|string %}selected{% endif %}>{{ c.name }}</option>{% endfor %}</select><select name="estado"><option value="">Todos los estados</option><option value="ACTIVE" {% if estado=='ACTIVE' %}selected{% endif %}>Activo</option><option value="INACTIVE" {% if estado=='INACTIVE' %}selected{% endif %}>Inactivo</option></select><button class="btn" type="submit">Buscar</button></form><div class="table-card"><table><thead><tr><th>Producto</th><th>SKU</th><th>GTIN</th><th>Marca</th><th>Categoría</th><th>Presentación</th><th>Estado</th><th>Acciones</th></tr></thead><tbody>{% for p in productos %}<tr><td><b>{{ p.description }}</b><small>ID {{ p.product_id }}</small></td><td>{{ p.sku_code or '—' }}</td><td>{{ p.gtin or '—' }}<small>{{ p.gtins }} asociado(s)</small></td><td>{{ p.marca or '—' }}</td><td>{{ p.categoria or '—' }}</td><td>{{ p.presentation or ((p.net_content|string)+' '+(p.uom or '')) if p.net_content else '—' }}</td><td><span class="badge {{ 'inactive' if p.status!='ACTIVE' else '' }}">{{ p.status }}</span></td><td class="actions"><a href="{{ url_for('producto_editar',product_id=p.product_id) }}">Editar</a>{% if p.status=='ACTIVE' %}<form method="post" action="{{ url_for('producto_desactivar',product_id=p.product_id) }}"><button data-confirm="¿Desactivar este producto?">Desactivar</button></form>{% endif %}</td></tr>{% else %}<tr><td colspan="8" class="empty">No hay productos.</td></tr>{% endfor %}</tbody></table></div></section>{% endblock %}
+{% extends 'base.html' %}
+{% block title %}Productos | RetailMan{% endblock %}
+{% block content %}
+<section class="content">
+  <div class="heading">
+    <div><h1>Productos / SKU</h1><p>Consulta de SKU, marca, GTIN y categorías asociadas.</p></div>
+    <a class="btn primary" href="{{ url_for('producto_nuevo') }}">＋ Nuevo producto</a>
+  </div>
+
+  {% if db_error %}<div class="alert"><b>Error de Oracle</b><span>{{ db_error }}</span></div>{% endif %}
+
+  <form class="filters" method="get">
+    <input name="q" value="{{ q }}" placeholder="Buscar SKU, descripción o GTIN">
+    <select name="marca"><option value="">Todas las marcas</option>{% for m in marcas %}<option value="{{ m.brand_id }}" {% if marca_sel==m.brand_id|string %}selected{% endif %}>{{ m.name }}</option>{% endfor %}</select>
+    <select name="categoria"><option value="">Todas las categorías</option>{% for c in categorias %}<option value="{{ c.category_id }}" {% if categoria_sel==c.category_id|string %}selected{% endif %}>{{ c.name }}</option>{% endfor %}</select>
+    <select name="estado"><option value="">Todos los estados</option><option value="ACTIVE" {% if estado=='ACTIVE' %}selected{% endif %}>Activo</option><option value="INACTIVE" {% if estado=='INACTIVE' %}selected{% endif %}>Inactivo</option></select>
+    <button class="btn" type="submit">Buscar</button>
+  </form>
+
+  <div class="table-card">
+    <table>
+      <thead><tr><th>Producto</th><th>SKU</th><th>GTIN</th><th>Marca</th><th>Categoría</th><th>Presentación</th><th>Estado</th><th>Acciones</th></tr></thead>
+      <tbody>
+      {% for p in productos %}
+      <tr>
+        <td><b>{{ p.description }}</b><small>ID {{ p.product_id }}</small></td>
+        <td>{{ p.sku_code or '—' }}</td>
+        <td>{{ p.gtin or '—' }}<small>{{ p.gtins }} asociado(s)</small></td>
+        <td>{{ p.marca or '—' }}</td>
+        <td>{{ p.categoria or '—' }}</td>
+        <td>
+          {% if p.presentation %}
+            {{ p.presentation }}
+          {% elif p.net_content %}
+            {{ p.net_content }} {{ p.uom or '' }}
+          {% else %}
+            —
+          {% endif %}
+        </td>
+        <td><span class="badge {{ 'inactive' if p.status!='ACTIVE' else '' }}">{{ p.status }}</span></td>
+        <td class="actions">
+          <a href="{{ url_for('catalogo_detalle',product_id=p.product_id) }}">Consultar</a>
+          <a href="{{ url_for('producto_editar',product_id=p.product_id) }}">Editar</a>
+          {% if p.status=='ACTIVE' %}<form method="post" action="{{ url_for('producto_desactivar',product_id=p.product_id) }}"><button data-confirm="¿Desactivar este producto?">Desactivar</button></form>{% endif %}
+        </td>
+      </tr>
+      {% else %}<tr><td colspan="8" class="empty">No hay productos.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
