@@ -1,11 +1,64 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>{% block title %}RetailMan{% endblock %}</title><link rel="stylesheet" href="{{ url_for('static',filename='css/estilos.css') }}"></head><body>
-<aside class="sidebar"><div class="brand"><div class="brand-mark">R</div><div><strong>RetailMan</strong><span>Gestión de catálogo</span></div></div><nav>
-<a class="{{ 'active' if request.endpoint=='dashboard' else '' }}" href="{{ url_for('dashboard') }}">⌂ <span>Inicio</span></a>
-<a class="{{ 'active' if request.endpoint and request.endpoint.startswith('producto') else '' }}" href="{{ url_for('productos') }}">▣ <span>Productos</span></a>
-<p>MAESTROS</p>
-{% for key,label in [('categoria','Categorías'),('marca','Marcas'),('fabricante','Fabricantes'),('retailer','Retailers'),('formato','Formatos'),('mercado','Mercados'),('canal','Canales'),('punto_venta','Puntos de venta')] %}<a href="{{ url_for('master_list',nombre=key) }}">• <span>{{ label }}</span></a>{% endfor %}
-<p>BASE DE DATOS</p><a href="{{ url_for('relaciones') }}">⇄ <span>Relaciones</span></a><a href="{{ url_for('conexion') }}">◉ <span>Conexión Oracle</span></a>
-</nav></aside>
-<main class="main"><header class="topbar"><div><h2>RetailMan</h2><span>Oracle Database · Flask</span></div><div class="profile"><div class="avatar">RM</div><div><strong>RETAILMAN</strong><small>Base única: RetailMan.sql</small></div></div></header>
-{% with messages=get_flashed_messages(with_categories=true) %}{% if messages %}<div class="flash-wrap">{% for category,message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}</div>{% endif %}{% endwith %}
-{% block content %}{% endblock %}</main><script src="{{ url_for('static',filename='js/app.js') }}"></script></body></html>
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>{% block title %}RetailMan{% endblock %}</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static',filename='css/estilos.css') }}"
+    />
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">R</div>
+        <div><strong>RetailMan</strong><span>Gestión de catálogo</span></div>
+      </div>
+      <nav>
+        <a
+          class="{{ 'active' if request.endpoint=='dashboard' else '' }}"
+          href="{{ url_for('dashboard') }}"
+          >⌂ <span>Inicio</span></a
+        >
+        <a
+          class="{{ 'active' if request.endpoint and request.endpoint.startswith('producto') else '' }}"
+          href="{{ url_for('productos') }}"
+          >▣ <span>Productos</span></a
+        >
+        <p>MAESTROS</p>
+        {% for key,label in
+        [('categoria','Categorías'),('marca','Marcas'),('fabricante','Fabricantes'),('retailer','Retailers'),('formato','Formatos'),('mercado','Mercados'),('canal','Canales'),('punto_venta','Puntos
+        de venta')] %}<a href="{{ url_for('master_list',nombre=key) }}"
+          >• <span>{{ label }}</span></a
+        >{% endfor %}
+        <p>BASE DE DATOS</p>
+        <a href="{{ url_for('relaciones') }}">⇄ <span>Relaciones</span></a
+        ><a href="{{ url_for('conexion') }}">◉ <span>Conexión Oracle</span></a>
+      </nav>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <h2>RetailMan</h2>
+          <span>Oracle Database · Flask</span>
+        </div>
+        <div class="profile">
+          <div class="avatar">RM</div>
+          <div>
+            <strong>RETAILMAN</strong><small>Base única: RetailMan.sql</small>
+          </div>
+        </div>
+      </header>
+      {% with messages=get_flashed_messages(with_categories=true) %}{% if
+      messages %}
+      <div class="flash-wrap">
+        {% for category,message in messages %}
+        <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}{% endwith %} {% block content %}{% endblock %}
+    </main>
+    <script src="{{ url_for('static',filename='js/app.js') }}"></script>
+  </body>
+</html>

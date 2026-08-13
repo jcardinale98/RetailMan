@@ -1,0 +1,93 @@
+{% extends 'base.html' %} {% block title %}Catálogo | {{ producto.description
+}}{% endblock %} {% block content %}
+<section class="content">
+  <div class="heading">
+    <div>
+      <h1>{{ producto.description }}</h1>
+      <p>Consulta actualizada del catálogo maestro.</p>
+    </div>
+    <a class="btn" href="{{ url_for('productos') }}">← Productos</a>
+  </div>
+
+  <div class="cards catalog-cards">
+    <div class="card">
+      <span>SKU</span
+      ><strong class="small-strong">{{ producto.sku_code or '—' }}</strong
+      ><small>ID {{ producto.product_id }}</small>
+    </div>
+    <div class="card">
+      <span>Marca</span
+      ><strong class="small-strong">{{ producto.marca or '—' }}</strong
+      ><small>{{ producto.fabricante or 'Sin fabricante' }}</small>
+    </div>
+    <div class="card">
+      <span>Estado</span
+      ><strong class="small-strong">{{ producto.status }}</strong
+      ><small>{{ producto.presentation or 'Sin presentación' }}</small>
+    </div>
+  </div>
+
+  <div class="split">
+    <div class="panel">
+      <h3>GTIN asociados</h3>
+      {% for g in gtins %}<span class="chip">{{ g.gtin }}</span>{% else %}
+      <p>Sin GTIN asociados.</p>
+      {% endfor %}
+    </div>
+    <div class="panel">
+      <h3>Categorías asociadas</h3>
+      {% for c in categorias %}<span class="chip"
+        >Nivel {{ c.level_no }} · {{ c.name }}</span
+      >{% else %}
+      <p>Sin categorías asociadas.</p>
+      {% endfor %}
+    </div>
+  </div>
+
+
+  <div class="panel">
+    <h3>Retailers y puntos de venta relacionados</h3>
+    <p class="muted">
+      Cada fila muestra la relación real entre retailer, mercado y punto de
+      venta.
+    </p>
+    <div class="table-card flat">
+      <table>
+        <thead>
+          <tr>
+            <th>Retailer</th>
+            <th>Mercado</th>
+            <th>Punto de venta</th>
+            <th>Zona</th>
+            <th>Dirección</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in estructura_comercial %}
+          <tr>
+            <td><b>{{ r.retailer }}</b></td>
+            <td>{{ r.mercado }}</td>
+            <td>{{ r.punto_venta or 'Sin punto de venta registrado' }}</td>
+            <td>{{ r.zone or '—' }}</td>
+            <td>{{ r.address or '—' }}</td>
+            <td>
+              {% if r.punto_venta %}<span
+                class="badge {{ 'inactive' if r.status!='ACTIVE' else '' }}"
+                >{{ r.status }}</span
+              >{% else %}—{% endif %}
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="6" class="empty">
+              No hay relaciones comerciales registradas.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}

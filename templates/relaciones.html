@@ -1,1 +1,206 @@
-{% extends 'base.html' %}{% block title %}Relaciones | RetailMan{% endblock %}{% block content %}<section class="content"><div class="heading"><div><h1>Relaciones de la base de datos</h1><p>Vista integrada de las tablas puente presentes en RetailMan.sql.</p></div></div>{% if db_error %}<div class="alert">{{ db_error }}</div>{% endif %}{% for title,rows in sections %}<div class="panel"><h3>{{ title }}</h3><div class="table-card flat"><table>{% if rows %}<thead><tr>{% for k in rows[0].keys() %}<th>{{ k|replace('_',' ')|title }}</th>{% endfor %}</tr></thead><tbody>{% for r in rows %}<tr>{% for v in r.values() %}<td>{{ v if v is not none else '—' }}</td>{% endfor %}</tr>{% endfor %}</tbody>{% else %}<tbody><tr><td class="empty">Sin registros</td></tr></tbody>{% endif %}</table></div></div>{% endfor %}</section>{% endblock %}
+{% extends 'base.html' %} {% block title %}Relaciones | RetailMan{% endblock %}
+{% block content %}
+<section class="content">
+  <div class="heading">
+    <div>
+      <h1>Relaciones de la base de datos</h1>
+      <p>Gestiona las asociaciones definidas en RetailMan.sql.</p>
+    </div>
+  </div>
+  {% if db_error %}
+  <div class="alert">{{ db_error }}</div>
+  {% endif %}
+
+  <div class="panel">
+    <h3>Retailer ↔ Mercado</h3>
+    <form
+      class="relation-form"
+      method="post"
+      action="{{ url_for('relacion_retailer_mercado') }}"
+    >
+      <select name="retailer_id" required>
+        <option value="">Retailer...</option>
+        {% for x in retailers %}
+        <option value="{{ x.id }}">{{ x.label }}</option>
+        {% endfor %}
+      </select>
+      <select name="market_id" required>
+        <option value="">Mercado...</option>
+        {% for x in mercados %}
+        <option value="{{ x.id }}">{{ x.label }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn primary">Asociar</button>
+    </form>
+    <div class="table-card flat">
+      <table>
+        <thead>
+          <tr>
+            <th>Retailer</th>
+            <th>Mercado</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in retailer_mercado %}
+          <tr>
+            <td>{{ r.retailer }}</td>
+            <td>{{ r.mercado }}</td>
+            <td>
+              <form
+                method="post"
+                action="{{ url_for('relacion_retailer_mercado_eliminar') }}"
+              >
+                <input
+                  type="hidden"
+                  name="retailer_id"
+                  value="{{ r.retailer_id }}"
+                /><input
+                  type="hidden"
+                  name="market_id"
+                  value="{{ r.market_id }}"
+                /><button
+                  class="link-danger"
+                  data-confirm="¿Desasociar este mercado?"
+                >
+                  Desasociar
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="3" class="empty">Sin registros</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Retailer ↔ Formato</h3>
+    <form
+      class="relation-form relation-form-wide"
+      method="post"
+      action="{{ url_for('relacion_retailer_formato') }}"
+    >
+      <select name="retailer_id" required>
+        <option value="">Retailer...</option>
+        {% for x in retailers %}
+        <option value="{{ x.id }}">{{ x.label }}</option>
+        {% endfor %}
+      </select>
+      <select name="format_id" required>
+        <option value="">Formato...</option>
+        {% for x in formatos %}
+        <option value="{{ x.id }}">{{ x.label }}</option>
+        {% endfor %}
+      </select>
+      <input name="name" required placeholder="Nombre comercial" />
+      <button class="btn primary">Asociar</button>
+    </form>
+    <div class="table-card flat">
+      <table>
+        <thead>
+          <tr>
+            <th>Retailer</th>
+            <th>Formato</th>
+            <th>Nombre comercial</th>
+            <th>Estado</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in retailer_formato %}
+          <tr>
+            <td>{{ r.retailer }}</td>
+            <td>{{ r.formato }}</td>
+            <td>{{ r.nombre_comercial }}</td>
+            <td>
+              <span class="badge {{ 'inactive' if r.estado!='ACTIVE' else '' }}"
+                >{{ r.estado }}</span
+              >
+            </td>
+            <td>
+              {% if r.estado=='ACTIVE' %}
+              <form
+                method="post"
+                action="{{ url_for('relacion_retailer_formato_desactivar',rel_id=r.retailer_format_id) }}"
+              >
+                <button
+                  class="link-danger"
+                  data-confirm="¿Inactivar esta asociación?"
+                >
+                  Inactivar
+                </button>
+              </form>
+              {% else %}—{% endif %}
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="5" class="empty">Sin registros</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Producto ↔ Categoría</h3>
+    <div class="table-card flat">
+      <table>
+        <thead>
+          <tr>
+            <th>SKU</th>
+            <th>Producto</th>
+            <th>Categoría</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in producto_categoria %}
+          <tr>
+            <td>{{ r.sku or '—' }}</td>
+            <td>{{ r.producto }}</td>
+            <td>{{ r.categoria }}</td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="3" class="empty">Sin registros</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="panel">
+    <h3>Producto ↔ GTIN</h3>
+    <div class="table-card flat">
+      <table>
+        <thead>
+          <tr>
+            <th>SKU</th>
+            <th>Producto</th>
+            <th>GTIN</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in producto_gtin %}
+          <tr>
+            <td>{{ r.sku or '—' }}</td>
+            <td>{{ r.producto }}</td>
+            <td>{{ r.gtin }}</td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="3" class="empty">Sin registros</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}

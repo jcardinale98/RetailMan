@@ -1,1 +1,25 @@
-{% extends 'base.html' %}{% block title %}Conexión | RetailMan{% endblock %}{% block content %}<section class="content narrow"><div class="connection {{ 'ok' if ok else 'bad' }}"><div class="big-icon">{{ '✓' if ok else '!' }}</div>{% if ok %}<h1>Conexión Oracle exitosa</h1><p>Flask abrió una sesión real contra Oracle.</p><dl><dt>Usuario</dt><dd>{{ info.user }}</dd><dt>Servicio</dt><dd>{{ info.service }}</dd><dt>Script del proyecto</dt><dd>database/RetailMan.sql</dd></dl><a class="btn primary" href="{{ url_for('dashboard') }}">Ir al sistema</a>{% else %}<h1>No se pudo conectar</h1><p>Revisa Oracle, el servicio y el archivo <code>.env</code>.</p><pre>{{ error }}</pre>{% endif %}</div></section>{% endblock %}
+{% extends 'base.html' %}{% block title %}Conexión | RetailMan{% endblock %}{%
+block content %}
+<section class="content narrow">
+  <div class="connection {{ 'ok' if ok else 'bad' }}">
+    <div class="big-icon">{{ '✓' if ok else '!' }}</div>
+    {% if ok %}
+    <h1>Conexión Oracle exitosa</h1>
+    <p>Flask abrió una sesión real contra Oracle.</p>
+    <dl>
+      <dt>Usuario</dt>
+      <dd>{{ info.user }}</dd>
+      <dt>Servicio</dt>
+      <dd>{{ info.service }}</dd>
+      <dt>Script del proyecto</dt>
+      <dd>database/RetailMan.sql</dd>
+    </dl>
+    <a class="btn primary" href="{{ url_for('dashboard') }}">Ir al sistema</a>{%
+    else %}
+    <h1>No se pudo conectar</h1>
+    <p>Revisa Oracle, el servicio y el archivo <code>.env</code>.</p>
+    <pre>{{ error }}</pre>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

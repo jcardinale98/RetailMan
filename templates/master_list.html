@@ -1,1 +1,80 @@
-{% extends 'base.html' %}{% block title %}{{ config.title }} | RetailMan{% endblock %}{% block content %}<section class="content"><div class="heading"><div><h1>{{ config.title }}</h1><p>CRUD conectado directamente con la tabla {{ config.table }} de RetailMan.sql.</p></div><a class="btn primary" href="{{ url_for('master_new',nombre=nombre) }}">＋ Nuevo registro</a></div>{% if db_error %}<div class="alert"><b>Error Oracle</b><span>{{ db_error }}</span></div>{% endif %}<form class="filters simple" method="get"><input name="q" value="{{ q }}" placeholder="Buscar..."><button class="btn">Buscar</button></form><div class="table-card"><table><thead><tr><th>{{ config.pk }}</th>{% for f in config.fields %}<th>{{ f[1] }}</th>{% endfor %}<th>Acciones</th></tr></thead><tbody>{% for row in rows %}<tr><td>{{ row[config.pk] }}</td>{% for f in config.fields %}<td>{% if f[2]=='status' %}<span class="badge {{ 'inactive' if row[f[0]]!='ACTIVE' else '' }}">{{ row[f[0]] }}</span>{% else %}{{ row[f[0]] if row[f[0]] is not none else '—' }}{% endif %}</td>{% endfor %}<td class="actions"><a href="{{ url_for('master_edit',nombre=nombre,item_id=row[config.pk]) }}">Editar</a><form method="post" action="{{ url_for('master_delete',nombre=nombre,item_id=row[config.pk]) }}"><button data-confirm="¿Aplicar esta acción?">{{ 'Desactivar' if config.fields|selectattr('0','equalto','status')|list else 'Eliminar' }}</button></form></td></tr>{% else %}<tr><td colspan="20" class="empty">No hay registros.</td></tr>{% endfor %}</tbody></table></div></section>{% endblock %}
+{% extends 'base.html' %} {% block title %}{{ config.title }} | RetailMan{%
+endblock %} {% block content %}
+<section class="content">
+  <div class="heading">
+    <div>
+      <h1>{{ config.title }}</h1>
+      <p>CRUD conectado con RetailMan.sql.</p>
+    </div>
+    <a class="btn primary" href="{{ url_for('master_new',nombre=nombre) }}"
+      >＋ Nuevo registro</a
+    >
+  </div>
+
+  {% if db_error %}
+  <div class="alert"><b>Error Oracle</b><span>{{ db_error }}</span></div>
+  {% endif %}
+
+  <form class="filters simple" method="get">
+    <input name="q" value="{{ q }}" placeholder="Buscar..." />
+    <button class="btn">Buscar</button>
+  </form>
+
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th>{{ config.pk }}</th>
+          {% for f in config.fields %}
+          <th>{{ f[1] }}</th>
+          {% endfor %}
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          <td>{{ row[config.pk] }}</td>
+          {% for f in config.fields %}
+          <td>
+            {% if f[2]=='status' %}
+            <span class="badge {{ 'inactive' if row[f[0]]!='ACTIVE' else '' }}"
+              >{{ row[f[0]] }}</span
+            >
+            {% else %} {{ row[f[0]] if row[f[0]] is not none else '—' }} {%
+            endif %}
+          </td>
+          {% endfor %}
+          <td class="actions">
+            <a
+              href="{{ url_for('master_edit',nombre=nombre,item_id=row[config.pk]) }}"
+              >Editar</a
+            >
+            <form
+              method="post"
+              action="{{ url_for('master_delete',nombre=nombre,item_id=row[config.pk]) }}"
+            >
+              {% if nombre == 'retailer' %}
+              <button data-confirm="¿Cambiar el estado de este retailer?">
+                {{ 'Activar' if row.status=='INACTIVE' else 'Inactivar' }}
+              </button>
+              {% elif nombre in ('categoria','punto_venta') %}
+              <button data-confirm="¿Inactivar este registro?">
+                Inactivar
+              </button>
+              {% else %}
+              <button data-confirm="¿Aplicar esta acción?">Eliminar</button>
+              {% endif %}
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="20" class="empty">No hay registros.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
